@@ -27,7 +27,6 @@ def hello_world():
         total_yield=_sanitize_modbus_value(_get_modbus_message(client, 30529, 2, 3).decode_32bit_uint())
     )
     client.close()
-    print('ototototto')
     return jsonify(data)
 
 
