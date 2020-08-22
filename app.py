@@ -39,7 +39,7 @@ def teleinfo():
     teleinfo.open()
     frame = teleinfo.readframe()
     teleinfo.close()
-    return jsonify(frame)
+    return jsonify({item['name']: item['value'] for item in frame})
 
 
 def _get_modbus_message(client, adress, count, unit):
