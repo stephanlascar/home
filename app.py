@@ -5,6 +5,9 @@ from flask_caching import Cache
 from pymodbus.client.sync import ModbusTcpClient
 from pymodbus.constants import Endian
 from pymodbus.payload import BinaryPayloadDecoder
+from teleinfo import Parser
+from teleinfo.hw_vendors import UTInfo2
+
 
 MAX_SIGNED = 2147483648
 
@@ -14,7 +17,7 @@ cache = Cache(application, config={'CACHE_TYPE': 'simple'})
 
 @application.route('/api/power-consumption/solar-panel')
 @cache.cached(timeout=60)
-def hello_world():
+def solar_panel():
     client = ModbusTcpClient('192.168.0.4', retries=3, unit_id=3, timeout=1000)
 
     data = dict(
@@ -28,6 +31,13 @@ def hello_world():
     )
     client.close()
     return jsonify(data)
+
+
+@application.route('/api/power-consumption/teleinfo')
+def teleinfo():
+    ti = Parser(UTInfo2(port='/dev/ttyUSB0'))
+    ti.get_frame()
+    return jsonify(ti)
 
 
 def _get_modbus_message(client, adress, count, unit):
