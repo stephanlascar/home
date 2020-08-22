@@ -5,8 +5,7 @@ from flask_caching import Cache
 from pymodbus.client.sync import ModbusTcpClient
 from pymodbus.constants import Endian
 from pymodbus.payload import BinaryPayloadDecoder
-from teleinfo import Parser
-from teleinfo.hw_vendors import UTInfo2
+import kylin
 
 
 MAX_SIGNED = 2147483648
@@ -34,10 +33,13 @@ def solar_panel():
 
 
 @application.route('/api/power-consumption/teleinfo')
+@cache.cached(timeout=60)
 def teleinfo():
-    ti = Parser(UTInfo2(port='/dev/ttyUSB0'))
-    ti.get_frame()
-    return jsonify(ti)
+    teleinfo = kylin.Kylin(timeout=2, verbose=True)
+    teleinfo.open()
+    frame = teleinfo.readframe()
+    teleinfo.close()
+    return jsonify(frame)
 
 
 def _get_modbus_message(client, adress, count, unit):
