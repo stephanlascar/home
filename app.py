@@ -35,7 +35,7 @@ def solar_panel():
 @application.route('/api/power-consumption/teleinfo')
 @cache.cached(timeout=60)
 def teleinfo():
-    teleinfo = kylin.Kylin(timeout=2, verbose=True)
+    teleinfo = kylin.Kylin(timeout=2, port='/dev/ttyUSB0')
     teleinfo.open()
     frame = teleinfo.readframe()
     teleinfo.close()
