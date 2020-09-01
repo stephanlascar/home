@@ -1,6 +1,6 @@
 import datetime
 
-from flask import Flask, jsonify, g
+from flask import Flask, jsonify
 from flask_caching import Cache
 from pymodbus.client.sync import ModbusTcpClient
 from pymodbus.constants import Endian
@@ -12,6 +12,7 @@ MAX_SIGNED = 2147483648
 
 application = Flask(__name__)
 cache = Cache(application, config={'CACHE_TYPE': 'simple'})
+last_teleinfo_frame = dict()
 
 
 @application.route('/api/power-consumption/solar-panel')
@@ -41,11 +42,10 @@ def teleinfo():
     result = {item['name']: item['value'] for item in frame}
 
     result['WINST'] = int(result['IINST']) * 234
-    result['WINST2'] = (int(result['HCHP']) - g.get('hchp', int(result['HCHP']))) + (int(result['HCHC']) - g.get('hchc', int(result['HCHC'])))
+    result['WINST2'] = (int(result['HCHP']) - last_teleinfo_frame.get('hchp', int(result['HCHP']))) + (int(result['HCHC']) - last_teleinfo_frame.get('hchc', int(result['HCHC'])))
     result['WINJT'] = int(result['PAPP']) if int(result['IINST']) == 0 else 0
 
-    g.hchp = int(result['HCHP'])
-    g.hchc = int(result['HCHC'])
+    last_teleinfo_frame.update(result)
     teleinfo.close()
     return jsonify(result)
 
