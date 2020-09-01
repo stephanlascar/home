@@ -38,9 +38,10 @@ def teleinfo():
     teleinfo = kylin.Kylin(timeout=2, port='/dev/ttyUSB0')
     teleinfo.open()
     frame = teleinfo.readframe()
-    frame['WINST'] = frame['IINST'] * 234
+    result = {item['name']: item['value'] for item in frame}
+    result['WINST'] = result['IINST'] * 234
     teleinfo.close()
-    return jsonify({item['name']: item['value'] for item in frame})
+    return jsonify(result)
 
 
 def _get_modbus_message(client, adress, count, unit):
