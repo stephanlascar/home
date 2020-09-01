@@ -39,7 +39,7 @@ def teleinfo():
     teleinfo.open()
     frame = teleinfo.readframe()
     result = {item['name']: item['value'] for item in frame}
-    result['WINST'] = result['IINST'] * 234
+    result['WINST'] = int(result['IINST']) * 234
     teleinfo.close()
     return jsonify(result)
 
