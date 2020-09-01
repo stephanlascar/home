@@ -38,6 +38,7 @@ def teleinfo():
     teleinfo = kylin.Kylin(timeout=2, port='/dev/ttyUSB0')
     teleinfo.open()
     frame = teleinfo.readframe()
+    frame['WINST'] = frame['IINST'] * 234
     teleinfo.close()
     return jsonify({item['name']: item['value'] for item in frame})
 
